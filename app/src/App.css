@@ -1,38 +1,21 @@
+/* src/App.css */
+
 .App {
-  text-align: center;
+  text-align: center; /* Keep if desired */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+/* ... other rules like .App-logo ... */
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  background-color: #282c34; /* Keep if you want this background for your *page content* header */
   font-size: calc(10px + 2vmin);
   color: white;
+  /* REMOVE OR COMMENT OUT THESE CONFLICTING PROPERTIES: */
+  /* min-height: 100vh; */
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* align-items: center; */
+  /* justify-content: center; */
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* ... rest of your App.css ... */

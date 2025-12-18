@@ -1,11 +1,16 @@
 // src/App.js
-import React from 'react';
-import Layout from './components/Layout'; // Import your new Layout component
-import HomePage from './pages/HomePage';   // Import your example Home Page
-import { ThemeProvider } from '@magnetic/theme'; // NEW: Import ThemeProvider
 
-// Only global styles or styles not specific to Layout/Pages should be here.
-// For now, keep button styles here as HomePage uses it.
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import HomePage from './pages/HomePage';
+import MyAccessPage from './pages/MyAccessPage';
+import RequestAccessPage from './pages/RequestAccessPage';
+import ApprovalsPage from './pages/ApprovalsPage';
+import SnapshotsPage from './pages/SnapshotsPage';
+import ChangeLogPage from './pages/ChangeLogPage';
+import AdminPage from './pages/AdminPage';
+import { ThemeProvider } from '@magnetic/theme';
 import '@magnetic/button/styles.css';
 import './App.css';
 
@@ -13,7 +18,15 @@ function App() {
   return (
     <ThemeProvider theme="light-classic">
       <Layout>
-        <HomePage />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/my-access" element={<MyAccessPage />} />
+          <Route path="/request-access" element={<RequestAccessPage />} />
+          <Route path="/approvals" element={<ApprovalsPage />} />
+          <Route path="/snapshots" element={<SnapshotsPage />} />
+          <Route path="/change-log" element={<ChangeLogPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
       </Layout>
     </ThemeProvider>
   );

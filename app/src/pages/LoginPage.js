@@ -25,51 +25,52 @@ const LoginPage = () => {
   };
 
   return (
-    <Container
+    <div
       className="login-page"
       style={{
         minHeight: '100vh',
         background: 'var(--base-bg-default, #f2f5fa)',
+        boxSizing: 'border-box',
+        padding: '24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
       }}
     >
-      <div className="login-card">
-        <Flex direction="vertical" gap={24} style={{ width: '100%' }}>
-          {/* Header block */}
-          <Flex direction="vertical" align="center" gap={8}>
-            <Text variant="h1" align="center">
-              Meraki Admin JIT
-            </Text>
-            <Text variant="h3" align="center" color="subdued">
-              Just-in-Time Admin Access
-            </Text>
-          </Flex>
+      <div className="login-page-content">
+        <div className="login-card">
+          <Flex direction="vertical" gap={24} style={{ width: '100%' }}>
+            {/* Header block */}
+            <Flex direction="vertical" align="center" gap={8}>
+              <Text variant="h1" align="center">
+                Meraki Admin JIT
+              </Text>
+              <Text variant="h3" align="center" color="subdued">
+                Just-in-Time Admin Access
+              </Text>
+            </Flex>
 
-          <Text
-            variant="body"
-            align="center"
-            color="subdued"
-            style={{ maxWidth: 360, margin: '0 auto' }}
-          >
-            Secure access management for Meraki Dashboard administrators with
-            time-limited privilege escalation.
-          </Text>
-
-          <div className="login-card-divider" aria-hidden="true" />
-
-          {/* Sign-in block */}
-          <Flex direction="vertical" align="center" gap={12}>
-            <Button
-              kind="primary"
-              size="large"
-              onClick={handleLogin}
-              style={{ width: '100%', minWidth: 240 }}
+            <Text
+              variant="body"
+              align="center"
+              color="subdued"
+              style={{ maxWidth: 360, margin: '0 auto' }}
             >
-              Sign In with Duo SSO
-            </Button>
+              Secure access management for Meraki Dashboard administrators with
+              time-limited privilege escalation.
+            </Text>
+
+            <div className="login-card-divider" aria-hidden="true" />
+
+            {/* Sign-in block – button matches HomePage (md, generous padding) */}
+            <Flex direction="vertical" align="center" gap={12}>
+              <Button
+                kind="primary"
+                onClick={handleLogin}
+                className="login-button"
+              >
+                Sign In with Duo SSO
+              </Button>
             <Text variant="caption" align="center" color="subdued">
               Sign in using your organization&apos;s Duo Single Sign-On
             </Text>
@@ -88,7 +89,8 @@ const LoginPage = () => {
           </Flex>
         </Flex>
       </div>
-    </Container>
+      </div>
+    </div>
   );
 };
 

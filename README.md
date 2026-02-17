@@ -84,7 +84,15 @@ Edit **backend/.env**:
    - **Service Provider Login URL:** `https://YOUR-NGROK-URL.ngrok-free.app/api/auth/saml/login`
    - **NameID:** Email Address
    - **Sign response** and **Sign assertion:** enabled
-3. Copy into **backend/.env**:
+3. **Attribute mapping** (so the app can show first name in the header and display name + email in the profile dropdown):
+   - In the Duo SAML app configuration, find **Attributes** or **Attribute mapping**.
+   - Map your directory attributes to these **SAML attribute names** (the app expects these exact names):
+     - **Display name / full name** → SAML attribute name: `displayName` or `name` or `cn` (one is enough).
+     - **First name** → SAML attribute name: `givenName` or `firstName`.
+     - **Last name** → `sn` or `surname` or `lastName` (optional).
+     - **Email** is already provided as NameID; you can also send it as an attribute if needed.
+   - Example: if your IdP has "First Name" and "Display Name", map them to `givenName` and `displayName` respectively.
+4. Copy into **backend/.env**:
    - **Entity ID** → `DUO_ENTITY_ID`
    - **Single Sign-On URL** → `DUO_SSO_URL`
    - **Single Logout URL** → `DUO_SLO_URL`

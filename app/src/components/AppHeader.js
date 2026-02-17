@@ -18,15 +18,18 @@ import '@magnetic/skeleton/styles.css';
 const AppHeader = () => {
   const { user, loading, logout } = useAuth();
 
+  // Display name (full name from IdP): used in dropdown
   const displayName = user?.name || user?.email || null;
+  // First name: shown in header bar when present
+  const firstName = user?.first_name || null;
   const organization = user?.organization || user?.org || null;
 
   const headerContent = user ? (
     <Container style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 999 }}>
       <Flex direction="vertical" gap="sm">
-        <Text variant="body-md">Signed in as: {displayName || user.email}</Text>
-        {organization && <Text variant="body-sm">{organization}</Text>}
+        {displayName && <Text variant="body-md">{displayName}</Text>}
         {user.email && <Text variant="caption" color="subdued">{user.email}</Text>}
+        {organization && <Text variant="body-sm">{organization}</Text>}
         <Button
           kind="secondary"
           size="small"
@@ -39,7 +42,10 @@ const AppHeader = () => {
     </Container>
   ) : null;
 
-  const profileHeading = loading ? 'Loading...' : (displayName || user?.email || 'Account');
+  // Header bar: first name, then display name, then email (configure Duo to send givenName/displayName)
+  const profileHeading = loading
+    ? 'Loading...'
+    : (firstName || displayName || user?.email || 'Account');
   const profileSubHeading = loading ? '' : (organization || '');
 
   return (

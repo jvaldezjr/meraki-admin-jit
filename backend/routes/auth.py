@@ -127,12 +127,12 @@ def saml_acs():
         logger.debug(f"SAML attributes received: {list(attributes.keys())}")
         
         # Extract user information from SAML attributes
-        # Adjust these attribute names based on your Duo configuration
+        # Prefer displayName for full name (dropdown); firstName for header bar
         user_data = {
             'email': name_id,
-            'name': _get_attribute(attributes, ['name', 'displayName', 'cn'], name_id),
-            'first_name': _get_attribute(attributes, ['givenName', 'firstName'], ''),
-            'last_name': _get_attribute(attributes, ['sn', 'surname', 'lastName'], ''),
+            'name': _get_attribute(attributes, ['displayName', 'displayname', 'name', 'cn'], name_id),
+            'first_name': _get_attribute(attributes, ['firstName', 'firstname', 'givenName', 'givenname'], ''),
+            'last_name': _get_attribute(attributes, ['sn', 'surname', 'lastName', 'lastname'], ''),
             'organization': _get_attribute(attributes, ['organization', 'o', 'company'], ''),
             'role': _get_attribute(attributes, ['role', 'groups'], 'user'),
             'session_index': auth.get_session_index()

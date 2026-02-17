@@ -31,6 +31,7 @@ ngrok http 5001
 cd backend
 source venv/bin/activate   # or: .venv\Scripts\activate on Windows
 python app.py
+# Or with 1Password CLI for Meraki key: op run --env-file=.env.op -- python app.py
 
 # Terminal 3: Frontend
 cd app
@@ -154,12 +155,38 @@ meraki-admin-jit/
 | `DUO_X509_CERT` | Yes | Duo cert, single line, no line breaks |
 | `SESSION_COOKIE_SECURE` | No | `false` for local dev |
 | `FLASK_PORT` | No | Default `5001` |
+| `MERAKI_DASHBOARD_API_KEY` | For My Access | Meraki Dashboard API key (used by `/api/meraki/organizations`) |
+
+To use the local **dashboard-api-python** library instead of PyPI `meraki`, install it with:  
+`pip install -e /path/to/dashboard-api-python`, then ensure `MERAKI_DASHBOARD_API_KEY` is set (in `.env` or via 1Password below).
+
+### 1Password CLI (optional)
+
+To provide **MERAKI_DASHBOARD_API_KEY** (and optionally other secrets) from 1Password instead of plaintext in `.env`:
+
+1. **Install and sign in** to [1Password CLI](https://developer.1password.com/docs/cli/) (`op signin`).
+2. **Store the Meraki API key** in a 1Password item and copy its **secret reference** (e.g. `op://VaultName/ItemName/credential`).
+3. **Create backend/.env.op** (do not commit it; it’s in `.gitignore`):
+   ```bash
+   cp backend/.env.op.example backend/.env.op
+   # Edit .env.op and set MERAKI_DASHBOARD_API_KEY=op://YourVault/YourItem/field_name
+   ```
+4. **Run the backend with `op run`** so 1Password injects the secret into the environment (backend only; frontend has no Meraki key):
+
+   ```bash
+   cd backend
+   source venv/bin/activate
+   op run --env-file=.env.op -- python app.py
+   ```
+
+Keep your normal **.env** for non-secret config (e.g. `APP_URL`, `FRONTEND_URL`, Duo IDs). `op run` overlays the variables from `.env.op` (with references resolved) onto the process environment, and `python-dotenv` still loads `.env`, so both apply.
 
 ### API endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
+| GET | `/api/meraki/organizations` | List organizations (auth required; uses dashboard-api-python) |
 | GET | `/api/auth/saml/login` | Start SAML SSO |
 | POST | `/api/auth/saml/acs` | SAML callback (Duo posts here) |
 | GET | `/api/auth/saml/sls` | SAML logout |
@@ -179,7 +206,13 @@ meraki-admin-jit/
 
 ## Frontend (app)
 
-From **app/**:
+If you use an **internal npm registry** (e.g. for `@magnetic/*`), ensure `~/.npmrc` (or `app/.npmrc`) is configured so `npm install` resolves. Then from **app/**:
+
+```bash
+cd app
+npm install
+npm start
+```
 
 - `npm start` – dev server at http://localhost:3000
 - `npm test` – test runner

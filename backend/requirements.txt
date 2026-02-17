@@ -19,6 +19,9 @@ python-dotenv==1.0.0
 cryptography==41.0.7
 PyJWT==2.8.0
 
+# Meraki Dashboard API (or: pip install -e /path/to/dashboard-api-python)
+meraki
+
 # Optional: Database support (uncomment if needed)
 # psycopg2-binary==2.9.9  # PostgreSQL
 # SQLAlchemy==2.0.23

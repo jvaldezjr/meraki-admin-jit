@@ -1,0 +1,49 @@
+/* My Access – organizations table (Magnetic-aligned) */
+
+.my-access-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--base-border-default, #d7dfe9);
+  border-radius: 8px;
+  background: var(--base-bg-weak-default, #ffffff);
+}
+
+.my-access-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.my-access-table th,
+.my-access-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--base-border-default, #d7dfe9);
+}
+
+.my-access-table th {
+  background: var(--base-bg-weak-default, #f2f5fa);
+  white-space: nowrap;
+}
+
+.my-access-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.my-access-table tbody tr:hover {
+  background: var(--base-bg-weak-default, #f9fafb);
+}
+
+.my-access-link {
+  color: var(--magnetic-color-blue-600, #2563eb);
+  text-decoration: none;
+}
+
+.my-access-link:hover {
+  text-decoration: underline;
+}
+
+.my-access-link:focus {
+  outline: 2px solid var(--magnetic-color-blue-500, #3b82f6);
+  outline-offset: 2px;
+}

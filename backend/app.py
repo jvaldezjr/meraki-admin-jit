@@ -18,6 +18,7 @@ load_dotenv()
 
 # Import routes
 from routes.auth import auth_bp
+from routes.meraki import meraki_bp
 
 
 def create_app():
@@ -94,6 +95,7 @@ def create_app():
     # ===================
     
     app.register_blueprint(auth_bp)
+    app.register_blueprint(meraki_bp)
     
     # ===================
     # Health Check Endpoint

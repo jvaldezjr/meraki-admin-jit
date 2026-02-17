@@ -16,6 +16,7 @@ import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import CallbackPage from './pages/CallbackPage';
 import '@magnetic/button/styles.css';
+import '@magnetic/table/styles.css';
 import './App.css';
 
 function App() {

@@ -117,6 +117,8 @@ export const AuthProvider = ({ children }) => {
     checkAuth,
     setAuth,
     exchangeCodeForToken,
+    authHeaders,
+    apiBaseUrl,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

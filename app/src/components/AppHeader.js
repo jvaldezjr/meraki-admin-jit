@@ -3,6 +3,8 @@ import { Header } from '@magnetic/header';
 import { Container } from '@magnetic/container';
 import { Flex } from '@magnetic/flex';
 import { Text } from '@magnetic/text';
+import { Button } from '@magnetic/button';
+import { useAuth } from '../contexts/AuthContext';
 // import CiscoLogo from './CiscoLogo'; // If you're using a custom logo component
 
 // Import styles specific to the header components
@@ -14,34 +16,51 @@ import '@magnetic/skeleton/styles.css';
 
 
 const AppHeader = () => {
-  // Define headerContent here, as it's part of this Header component
-  const headerContent = (
+  const { user, loading, logout } = useAuth();
+
+  const displayName = user?.name || user?.email || null;
+  const organization = user?.organization || user?.org || null;
+
+  const headerContent = user ? (
     <Container style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 999 }}>
       <Flex direction="vertical" gap="sm">
-        <Text variant="body-md">Signed in as: Tier 1 Admin</Text>
-        <Text variant="body-sm">ACME Corp, Inc</Text>
-        <button style={{ marginTop: '10px', padding: '8px 12px', cursor: 'pointer' }}>Sign Out</button>
+        <Text variant="body-md">Signed in as: {displayName || user.email}</Text>
+        {organization && <Text variant="body-sm">{organization}</Text>}
+        {user.email && <Text variant="caption" color="subdued">{user.email}</Text>}
+        <Button
+          kind="secondary"
+          size="small"
+          onClick={logout}
+          style={{ marginTop: '10px' }}
+        >
+          Sign Out
+        </Button>
       </Flex>
     </Container>
-  );
+  ) : null;
+
+  const profileHeading = loading ? 'Loading...' : (displayName || user?.email || 'Account');
+  const profileSubHeading = loading ? '' : (organization || '');
 
   return (
     <Header
-      href="https://magnetic-react.cisco.com"
-    //   logo={<Plus />} // Using the Plus icon for the logo
+      href="/"
       productName="Meraki Admin JIT"
       profileAndTenant={{
         icon: "user",
         profile: {
-          heading: "Tier 1 Admin",
-          subHeading: "ACME Corp, Inc"
+          heading: profileHeading,
+          subHeading: profileSubHeading
         },
         content: headerContent,
         tooltipLabel: "My profile"
       }}
     >
-      <Header.Button icon="info" label="Info" onClick={() => console.log('Info button clicked')} />
-
+      <Header.Button 
+        icon="info" 
+        label="Info" 
+        onClick={() => console.log('Info button clicked')} 
+      />
     </Header>
   );
 };

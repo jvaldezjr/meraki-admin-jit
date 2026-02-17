@@ -52,7 +52,10 @@ def get_organizations():
     for org in orgs:
         org_id = org.get('id') or ''
         name = org.get('name') or ''
-        link = f"{MERAKI_DASHBOARD_ORG_BASE}/{org_id}/overview" if org_id else ''
+        # Use the API's url when present (region-specific, e.g. n165.dashboard.meraki.com)
+        link = (org.get('url') or '').strip() or (
+            f"{MERAKI_DASHBOARD_ORG_BASE}/{org_id}/overview" if org_id else ''
+        )
         result.append({
             'id': org_id,
             'name': name,

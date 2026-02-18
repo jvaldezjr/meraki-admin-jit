@@ -1,12 +1,12 @@
-# Flask Web Framework
-Flask==3.0.0
-Werkzeug==3.0.1
+# Flask Web Framework (3.0.3 fixes regressions; pin Werkzeug to match)
+Flask==3.0.3
+Werkzeug==3.0.3
 
 # SAML Authentication
 python3-saml==1.16.0
 
-# Session Management
-Flask-Session==0.5.0
+# Session Management (0.8.0 for Werkzeug 3.x cookie handling)
+Flask-Session==0.8.0
 redis==5.0.1
 
 # CORS Support
@@ -15,18 +15,18 @@ Flask-CORS==4.0.0
 # Environment Variables
 python-dotenv==1.0.0
 
-# Security
-cryptography==41.0.7
+# Security (46.0.5+ fixes CVE-2026-26007; do not downgrade)
+cryptography>=46.0.5
 PyJWT==2.8.0
 
-# Meraki Dashboard API (or: pip install -e /path/to/dashboard-api-python)
-meraki
+# Meraki Dashboard API (pinned to avoid breaking changes on pip install/upgrade)
+meraki==2.0.3
 
 # Optional: Database support (uncomment if needed)
 # psycopg2-binary==2.9.9  # PostgreSQL
 # SQLAlchemy==2.0.23
 
-# Development tools
-pytest==7.4.3
+# Development tools (pytest>=8.3.5 required by meraki 2.0.3)
+pytest>=8.3.5,<9.0.0
 pytest-flask==1.3.0
 

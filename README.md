@@ -29,7 +29,7 @@ ngrok http 5001
 
 # Terminal 2: Backend
 cd backend
-source venv/bin/activate   # or: .venv\Scripts\activate on Windows
+# If using pyenv-virtualenv: venv auto-activates. Else: source venv/bin/activate
 python app.py
 # Or with 1Password CLI for Meraki key: op run --env-file=.env.op -- python app.py
 
@@ -59,6 +59,29 @@ ngrok config add-authtoken YOUR_TOKEN
 Port **5001** is used so the backend doesn’t conflict with macOS AirPlay on 5000.
 
 ### 2. Backend
+
+**Option A: pyenv + pyenv-virtualenv (recommended if you use pyenv)**
+
+```bash
+# Ensure the plugin is loaded (add to shell if not already):
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
+
+# Create a virtualenv with your pyenv Python (e.g. 3.14.3)
+pyenv virtualenv 3.14.3 meraki-admin-jit-3.14.3
+
+# Use it for the backend (writes backend/.python-version; auto-activates when you cd backend)
+cd backend
+pyenv local meraki-admin-jit-3.14.3
+
+# Install deps and config (venv is already active)
+pip install -r requirements.txt
+cp env.example .env
+```
+
+From then on, `cd backend` will activate `meraki-admin-jit-3.14.3` automatically. To recreate the venv (e.g. after upgrading Python): `pyenv uninstall meraki-admin-jit-3.14.3` then run the `pyenv virtualenv` and `pyenv local` steps again.
+
+**Option B: stdlib venv**
 
 ```bash
 cd backend

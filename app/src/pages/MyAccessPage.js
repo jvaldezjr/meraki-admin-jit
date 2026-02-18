@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
+import { Button } from '@magnetic/button';
 import { Container } from '@magnetic/container';
 import { Flex } from '@magnetic/flex';
+import { Search } from '@magnetic/search';
 import { Text } from '@magnetic/text';
-import { Table, useMagneticTable, getPaginationRowModel } from '@magnetic/table';
+import {
+  Table,
+  useMagneticTable,
+  useTableSearch,
+  getPaginationRowModel,
+  getRowIndexColumn,
+} from '@magnetic/table';
 import { useAuth } from '../contexts/AuthContext';
 
 const getApiBaseUrl = () =>
@@ -11,7 +19,7 @@ const getApiBaseUrl = () =>
 
 const columnHelper = createColumnHelper();
 
-const orgColumns = [
+const orgColumnDefs = [
   columnHelper.accessor('id', {
     id: 'id',
     header: 'Organization ID',
@@ -45,11 +53,28 @@ const orgColumns = [
   }),
 ];
 
+/** Global filter that only matches Organization ID and Name (not index or link). */
+const orgIdAndNameFilterFn = (row, _columnIds, filterValue) => {
+  if (!filterValue || typeof filterValue !== 'string') return true;
+  const q = filterValue.trim().toLowerCase();
+  if (!q) return true;
+  const id = String(row.original?.id ?? '').toLowerCase();
+  const name = String(row.original?.name ?? '').toLowerCase();
+  return id.includes(q) || name.includes(q);
+};
+
 const MyAccessPage = () => {
   const { authHeaders, apiBaseUrl } = useAuth();
   const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchValue, setSearchValue] = useState('');
+  const { filter, handleSearchChange, setFilter } = useTableSearch();
+
+  const columns = useMemo(
+    () => [getRowIndexColumn(), ...orgColumnDefs],
+    []
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -72,13 +97,27 @@ const MyAccessPage = () => {
   }, [apiBaseUrl]);
 
   const { table } = useMagneticTable({
-    columns: orgColumns,
+    columns,
     data: organizations,
+    state: { globalFilter: filter },
+    onGlobalFilterChange: setFilter,
+    globalFilterFn: orgIdAndNameFilterFn,
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: { pageSize: 10 },
     },
   });
+
+  const handleSearchInputChange = (e) => {
+    setSearchValue(e.target.value);
+    handleSearchChange(e);
+  };
+  const handleSearchClear = () => {
+    setSearchValue('');
+    setFilter('');
+  };
+  const resultCount = table.getFilteredRowModel().rows.length;
+  const showReset = Boolean(filter && filter.trim().length > 0);
 
   if (loading) {
     return (
@@ -103,6 +142,24 @@ const MyAccessPage = () => {
         <Text variant="body" color="subdued">
           Organizations your Meraki API key can access.
         </Text>
+        <Flex align="center" gap="md" style={{ flexWrap: 'wrap' }}>
+          <Search
+            fixedWidth
+            label="org-search"
+            onChange={handleSearchInputChange}
+            onClear={handleSearchClear}
+            placeholder="Search by Organization ID or name…"
+            value={searchValue}
+          />
+          <Text color="light" style={{ whiteSpace: 'nowrap' }}>
+            {resultCount.toLocaleString()} result{resultCount !== 1 ? 's' : ''}
+          </Text>
+          {showReset && (
+            <Button kind="tertiary" onClick={handleSearchClear}>
+              Reset all
+            </Button>
+          )}
+        </Flex>
         <Flex grow style={{ minHeight: 0 }}>
           <Table
             table={table}

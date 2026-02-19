@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@magnetic/button": "^39.0.2",
+    "@magnetic/checkbox": "^39.0.2",
     "@magnetic/container": "^39.0.2",
     "@magnetic/flex": "^39.0.2",
     "@magnetic/header": "^39.0.2",

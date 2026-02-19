@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { Button } from '@magnetic/button';
+import { Checkbox } from '@magnetic/checkbox';
 import { Container } from '@magnetic/container';
 import { Flex } from '@magnetic/flex';
 import { Text } from '@magnetic/text';
@@ -29,8 +30,17 @@ const statusLabel = (status) => {
   return map[status] || status;
 };
 
+/** If all items have the same value for key, return it; otherwise return '(multiple)'. */
+function uniformOrMultiple(items, getValue) {
+  if (!items.length) return '';
+  const first = getValue(items[0]);
+  const allSame = items.every((item) => getValue(item) === first);
+  return allSame ? first : '(multiple)';
+}
+
 /**
  * Build table rows from requests: single-item requests = one row; multi-item = parent row + children.
+ * Parent row shows child value when all match, otherwise '(multiple)'.
  * Row shape: { rowId, requestedAt, scope, permission, approvalAt, status, children? }
  */
 function buildTableRows(requests) {
@@ -48,21 +58,22 @@ function buildTableRows(requests) {
         status: item.status,
       });
     } else {
+      const children = req.items.map((item, i) => ({
+        rowId: `${req.id}.${i + 1}`,
+        requestedAt: req.requestedAt,
+        scope: item.orgName,
+        permission: item.permission,
+        approvalAt: item.approvedAt,
+        status: item.status,
+      }));
       rows.push({
         rowId: req.id,
         requestedAt: req.requestedAt,
-        scope: '(multiple)',
-        permission: '',
-        approvalAt: '',
-        status: '',
-        children: req.items.map((item, i) => ({
-          rowId: `${req.id}.${i + 1}`,
-          requestedAt: req.requestedAt,
-          scope: item.orgName,
-          permission: item.permission,
-          approvalAt: item.approvedAt,
-          status: item.status,
-        })),
+        scope: uniformOrMultiple(req.items, (i) => i.orgName),
+        permission: uniformOrMultiple(req.items, (i) => i.permission),
+        approvalAt: uniformOrMultiple(req.items, (i) => i.approvedAt),
+        status: uniformOrMultiple(req.items, (i) => i.status),
+        children,
       });
     }
   }
@@ -112,7 +123,25 @@ const ApprovalsPage = () => {
 
   const columns = useMemo(
     () => [
-      { ...getSelectionColumn(), size: 48 },
+      {
+        ...getSelectionColumn(),
+        size: 48,
+        header: ({ table }) => {
+          const allSelected = table.getIsAllRowsSelected?.() ?? false;
+          const someSelected =
+            (table.getSelectedRowModel().rows.length > 0) && !allSelected;
+          return (
+            <Checkbox
+              checked={allSelected}
+              className="mds-rebuild-table-select-all-checkbox"
+              data-testid="table-select-all-checkbox"
+              indeterminate={someSelected}
+              onClick={table.getToggleAllRowsSelectedHandler?.() ?? (() => {})}
+              size={table.getState().density === 'condensed' ? 'sm' : 'md'}
+            />
+          );
+        },
+      },
       columnHelper.accessor('rowId', {
         id: 'rowId',
         header: 'Request ID',
@@ -149,7 +178,10 @@ const ApprovalsPage = () => {
         id: 'approvalAt',
         header: 'Approval timestamp',
         meta: { align: 'left' },
-        cell: (info) => <Text variant="body">{formatDate(info.getValue())}</Text>,
+        cell: (info) => {
+          const v = info.getValue();
+          return <Text variant="body">{v === '(multiple)' ? v : formatDate(v)}</Text>;
+        },
         size: 160,
       }),
       columnHelper.accessor('status', {
@@ -165,10 +197,12 @@ const ApprovalsPage = () => {
     []
   );
 
-  // Selectable: pending leaf rows, or parent rows (empty status) so selecting parent selects all children.
+  // Selectable: pending leaf rows, or parent rows only when at least one child is pending.
   const canSelectRow = (row) => {
     const original = row.original;
-    if (original.children) return true; // parent row
+    if (original.children) {
+      return original.children.some((child) => child.status === 'pending');
+    }
     return original.status === 'pending';
   };
 
@@ -177,6 +211,7 @@ const ApprovalsPage = () => {
     data: tableData,
     getRowId: (row) => row.rowId,
     enableRowSelection: canSelectRow,
+    enableSubRowSelection: true,
     state: { rowSelection },
     onRowSelectionChange: setRowSelection,
   });

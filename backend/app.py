@@ -86,7 +86,12 @@ def create_app():
         level=getattr(logging, log_level),
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-    
+    # Werkzeug is Flask's WSGI server (request logging). Not the Meraki SDK.
+    # Set to WARNING so we don't get a line per request; use INFO to see request log lines.
+    logging.getLogger('werkzeug').setLevel(
+        getattr(logging, os.getenv('WERKZEUG_LOG_LEVEL', 'WARNING').upper())
+    )
+
     logger = logging.getLogger(__name__)
     logger.info(f"Starting Meraki Admin JIT Backend in {os.getenv('FLASK_ENV', 'development')} mode")
     

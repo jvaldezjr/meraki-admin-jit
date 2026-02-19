@@ -1,0 +1,7 @@
+/* Request Access: left-align all labels and text */
+.request-access-selects .mds-rebuild-select-placeholder,
+.request-access-selects .mds-rebuild-multi-select-placeholder,
+.request-access-selects input,
+.request-access-selects input::placeholder {
+  text-align: left;
+}

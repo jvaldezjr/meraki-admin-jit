@@ -4,6 +4,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@magnetic/theme';
 import { AuthProvider } from './contexts/AuthContext';
+import { AccessRequestsProvider } from './contexts/AccessRequestsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
@@ -16,13 +17,16 @@ import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import CallbackPage from './pages/CallbackPage';
 import '@magnetic/button/styles.css';
+import '@magnetic/input/styles.css';
 import '@magnetic/table/styles.css';
+import '@magnetic/select/styles.css';
 import './App.css';
 
 function App() {
   return (
     <ThemeProvider theme="light-classic">
       <AuthProvider>
+        <AccessRequestsProvider>
         <Routes>
           {/* Public routes - no authentication required */}
           <Route path="/login" element={<LoginPage />} />
@@ -100,6 +104,7 @@ function App() {
             }
           />
         </Routes>
+        </AccessRequestsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

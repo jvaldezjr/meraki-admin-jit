@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
 /**
- * One organization + permission within a request.
- * @typedef {{ orgId: string, orgName: string, permission: 'read'|'write' }} AccessRequestItem
+ * One organization + permission within a request (item-level status for withdraw/approve).
+ * @typedef {{ orgId: string, orgName: string, permission: 'read'|'write', status: string, approvedAt: string|null }} AccessRequestItem
  */
 
 /**
@@ -10,15 +10,26 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
  * @typedef {{
  *   id: string,
  *   items: AccessRequestItem[],
- *   requestedAt: string,
- *   approvedAt: string|null,
- *   status: 'pending'|'approved'|'rejected'|'cancelled'
+ *   requestedAt: string
  * }} AccessRequest
  */
 
 const AccessRequestsContext = createContext(null);
 
-const generateId = () => `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+let requestIdCounter = 10000;
+const generateShortId = () => `req-${++requestIdCounter}`;
+
+/**
+ * Parse rowId (e.g. 'req-10001' or 'req-10001.2') into requestId and item index.
+ */
+export function parseRequestRowId(rowId) {
+  if (!rowId || typeof rowId !== 'string') return { requestId: null, itemIndex: 0 };
+  const dot = rowId.indexOf('.');
+  if (dot === -1) return { requestId: rowId, itemIndex: 0 };
+  const requestId = rowId.slice(0, dot);
+  const itemIndex = parseInt(rowId.slice(dot + 1), 10) - 1;
+  return { requestId, itemIndex: Number.isNaN(itemIndex) ? 0 : itemIndex };
+}
 
 export const useAccessRequests = () => {
   const ctx = useContext(AccessRequestsContext);
@@ -32,15 +43,15 @@ export const AccessRequestsProvider = ({ children }) => {
   const addRequest = useCallback((items) => {
     if (!items || !items.length) return null;
     const request = {
-      id: generateId(),
+      id: generateShortId(),
+      requestedAt: new Date().toISOString(),
       items: items.map(({ orgId, orgName, permission }) => ({
         orgId,
         orgName,
         permission: permission === 'write' ? 'write' : 'read',
+        status: 'pending',
+        approvedAt: null,
       })),
-      requestedAt: new Date().toISOString(),
-      approvedAt: null,
-      status: 'pending',
     };
     setRequests((prev) => [request, ...prev]);
     return request.id;
@@ -50,9 +61,35 @@ export const AccessRequestsProvider = ({ children }) => {
     setRequests((prev) =>
       prev.map((r) =>
         r.id === id
-          ? { ...r, status, approvedAt: approvedAt ?? r.approvedAt }
+          ? {
+              ...r,
+              items: r.items.map((item) => ({
+                ...item,
+                status,
+                approvedAt: approvedAt ?? item.approvedAt,
+              })),
+            }
           : r
       )
+    );
+  }, []);
+
+  const updateItemStatus = useCallback((rowId, status, approvedAt = null) => {
+    const { requestId, itemIndex } = parseRequestRowId(rowId);
+    if (!requestId) return;
+    setRequests((prev) =>
+      prev.map((r) => {
+        if (r.id !== requestId) return r;
+        const next = [...r.items];
+        if (itemIndex >= 0 && itemIndex < next.length) {
+          next[itemIndex] = {
+            ...next[itemIndex],
+            status,
+            approvedAt: approvedAt ?? next[itemIndex].approvedAt,
+          };
+        }
+        return { ...r, items: next };
+      })
     );
   }, []);
 
@@ -60,6 +97,7 @@ export const AccessRequestsProvider = ({ children }) => {
     requests,
     addRequest,
     updateRequestStatus,
+    updateItemStatus,
   };
 
   return (

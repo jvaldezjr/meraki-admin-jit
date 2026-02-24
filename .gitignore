@@ -1,1 +1,8 @@
 .npmrc
+
+# Environment and secrets (do not commit)
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.op

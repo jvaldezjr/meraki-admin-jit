@@ -202,7 +202,7 @@ To provide **MERAKI_DASHBOARD_API_KEY** (and optionally other secrets) from 1Pas
    op run --env-file=.env.op -- python app.py
    ```
 
-Keep your normal **.env** for non-secret config (e.g. `APP_URL`, `FRONTEND_URL`, Duo IDs). `op run` overlays the variables from `.env.op` (with references resolved) onto the process environment, and `python-dotenv` still loads `.env`, so both apply.
+Keep your normal **.env** for non-secret config (e.g. `APP_URL`, `FRONTEND_URL`, Duo IDs). `op run` overlays the variables from `.env.op` (with references resolved) onto the process environment, and `python-dotenv` still loads `.env`, so both apply. For production you can also store **SECRET_KEY** and **DUO_X509_CERT** in 1Password and add their `op://` references to `.env.op` so no secrets live in plaintext `.env`.
 
 ### API endpoints
 

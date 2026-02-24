@@ -10,8 +10,15 @@ from flask_cors import CORS
 from flask_session import Session
 from dotenv import load_dotenv
 import os
+import sys
 import logging
 from datetime import timedelta
+
+# Known placeholder values that must not be used in production
+_INSECURE_SECRET_KEY_PLACEHOLDERS = (
+    'your-super-secret-key-change-this-in-production',
+    'dev-secret-key-change-in-production',
+)
 
 # Load environment variables
 load_dotenv()
@@ -26,14 +33,21 @@ def create_app():
     Application factory function.
     Creates and configures the Flask application.
     """
+    secret_key = os.getenv('SECRET_KEY')
+    if not secret_key or (secret_key.strip() in _INSECURE_SECRET_KEY_PLACEHOLDERS):
+        raise RuntimeError(
+            'SECRET_KEY must be set to a secure value in the environment. '
+            'Generate with: openssl rand -hex 32'
+        )
+
     app = Flask(__name__)
     
     # ===================
     # Configuration
     # ===================
     
-    # Secret key for session management
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    # Secret key for session management (validated above)
+    app.config['SECRET_KEY'] = secret_key
     
     # Session configuration
     app.config['SESSION_TYPE'] = os.getenv('SESSION_TYPE', 'filesystem')
@@ -186,6 +200,12 @@ def create_app():
 # ===================
 
 if __name__ == '__main__':
+    secret_key = os.getenv('SECRET_KEY')
+    if not secret_key or secret_key.strip() in _INSECURE_SECRET_KEY_PLACEHOLDERS:
+        print('ERROR: SECRET_KEY must be set to a secure value.', file=sys.stderr)
+        print('Generate with: openssl rand -hex 32', file=sys.stderr)
+        sys.exit(1)
+
     app = create_app()
     
     # Get configuration from environment
@@ -212,9 +232,6 @@ if __name__ == '__main__':
     print("="*50 + "\n")
     
     # Verify environment variables
-    if not os.getenv('SECRET_KEY') or os.getenv('SECRET_KEY') == 'your-super-secret-key-change-this-in-production':
-        print("⚠️  WARNING: Using default SECRET_KEY. Set a secure SECRET_KEY in .env file!")
-    
     if not os.getenv('DUO_ENTITY_ID'):
         print("⚠️  WARNING: DUO_ENTITY_ID not set. Configure Duo settings in .env file!")
     

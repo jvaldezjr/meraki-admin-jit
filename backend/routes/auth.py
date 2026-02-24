@@ -55,7 +55,7 @@ def _user_from_request():
         try:
             payload = jwt.decode(
                 token,
-                os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production'),
+                os.getenv('SECRET_KEY'),
                 algorithms=[_JWT_ALGORITHM],
             )
             return (_safe_user(payload), None)
@@ -216,7 +216,7 @@ def exchange_code_for_token():
     payload['iat'] = int(time.time())
     token = jwt.encode(
         payload,
-        os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production'),
+        os.getenv('SECRET_KEY'),
         algorithm=_JWT_ALGORITHM,
     )
     return jsonify({

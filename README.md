@@ -178,23 +178,25 @@ meraki-admin-jit/
 | `DUO_X509_CERT` | Yes | Duo cert, single line, no line breaks |
 | `SESSION_COOKIE_SECURE` | No | `false` for local dev |
 | `FLASK_PORT` | No | Default `5001` |
-| `MERAKI_DASHBOARD_API_KEY` | For My Access | Meraki Dashboard API key (used by `/api/meraki/organizations`) |
+| `MERAKI_USER_API_KEY` | My Access page | Meraki API key for user view (used by `/api/meraki/my-organizations`) |
+| `MERAKI_SERVICE_API_KEY` | Request Access page | Meraki API key for org dropdown (used by `/api/meraki/organizations`) |
+| `MERAKI_DASHBOARD_API_KEY` | Fallback | Used when either of the above is not set |
 
 To use the local **dashboard-api-python** library instead of PyPI `meraki`, install it with:  
-`pip install -e /path/to/dashboard-api-python`, then ensure `MERAKI_DASHBOARD_API_KEY` is set (in `.env` or via 1Password below).
+`pip install -e /path/to/dashboard-api-python`, then set the Meraki keys (in `.env` or via 1Password below).
 
 ### 1Password CLI (optional)
 
-To provide **MERAKI_DASHBOARD_API_KEY** (and optionally other secrets) from 1Password instead of plaintext in `.env`:
+To provide **MERAKI_USER_API_KEY** and **MERAKI_SERVICE_API_KEY** (and optionally other secrets) from 1Password instead of plaintext in `.env`:
 
 1. **Install and sign in** to [1Password CLI](https://developer.1password.com/docs/cli/) (`op signin`).
-2. **Store the Meraki API key** in a 1Password item and copy its **secret reference** (e.g. `op://VaultName/ItemName/credential`).
+2. **Store the Meraki API keys** in 1Password and copy their **secret references** (e.g. `op://VaultName/ItemName/credential`).
 3. **Create backend/.env.op** (do not commit it; it’s in `.gitignore`):
    ```bash
    cp backend/.env.op.example backend/.env.op
-   # Edit .env.op and set MERAKI_DASHBOARD_API_KEY=op://YourVault/YourItem/field_name
+   # Edit .env.op and set MERAKI_USER_API_KEY=op://... and MERAKI_SERVICE_API_KEY=op://...
    ```
-4. **Run the backend with `op run`** so 1Password injects the secret into the environment (backend only; frontend has no Meraki key):
+4. **Run the backend with `op run`** so 1Password injects the secrets into the environment (backend only; frontend has no Meraki keys):
 
    ```bash
    cd backend
@@ -209,7 +211,8 @@ Keep your normal **.env** for non-secret config (e.g. `APP_URL`, `FRONTEND_URL`,
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
-| GET | `/api/meraki/organizations` | List organizations (auth required; uses dashboard-api-python) |
+| GET | `/api/meraki/organizations` | List organizations for Request Access dropdown (service key) |
+| GET | `/api/meraki/my-organizations` | List organizations for My Access page (user key) |
 | GET | `/api/auth/saml/login` | Start SAML SSO |
 | POST | `/api/auth/saml/acs` | SAML callback (Duo posts here) |
 | GET | `/api/auth/saml/sls` | SAML logout |

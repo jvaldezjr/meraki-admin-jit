@@ -79,7 +79,7 @@ const MyAccessPage = () => {
   useEffect(() => {
     let cancelled = false;
     const base = apiBaseUrl || getApiBaseUrl();
-    fetch(`${base}/api/meraki/organizations`, { headers: authHeaders() })
+    fetch(`${base}/api/meraki/my-organizations`, { headers: authHeaders() })
       .then((res) => {
         if (!res.ok) throw new Error(res.status === 503 ? 'Meraki API not configured' : res.statusText);
         return res.json();

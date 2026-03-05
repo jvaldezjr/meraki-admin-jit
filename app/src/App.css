@@ -4,6 +4,21 @@
   text-align: center; /* Keep if desired */
 }
 
+/* Header profile dropdown: hide horizontal divider below "Logged in as" when there are no sections below */
+.app-header-profile-content .mds-user-profile-divider,
+.app-header-profile-content .mds-divider {
+  display: none;
+}
+
+/* Header logo: use inverse icon color so logo is light on the dark bar (matches Magnetic header stories) */
+.mds-rebuild-header .mds-header-left .mds-header-branding-logo {
+  color: var(--mds-header-inverse-icon, #f7f7f7);
+}
+.mds-rebuild-header .mds-header-left .mds-header-branding-logo a,
+.mds-rebuild-header .mds-header-left .mds-header-branding-logo svg {
+  color: inherit;
+}
+
 /* ... other rules like .App-logo ... */
 
 .App-header {
